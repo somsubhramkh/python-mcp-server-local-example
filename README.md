@@ -71,22 +71,5 @@ MCP Server
     └── Open-Meteo API
 ```
 
-## Key Features
 
-✅ **No Authentication** - Open-Meteo API is free and open  
-✅ **Async/Await** - Fast, non-blocking requests  
-✅ **Error Handling** - Graceful handling of invalid inputs  
-✅ **Easy Testing** - MCP Inspector for interactive testing  
-✅ **Claude Integration** - Works with Claude Desktop app  
 
-## Requirements
-
-- Python 3.11+
-- Node.js (for MCP Inspector)
-- Internet connection (for weather data)
-
-## Learn More
-
-- [MCP Specification](https://modelcontextprotocol.io/)
-- [Open-Meteo API Docs](https://open-meteo.com/)
-- [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)
