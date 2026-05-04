@@ -45,8 +45,6 @@ New York, London, Tokyo, Paris, Sydney, Dubai, Singapore, San Francisco
 - **`weather_server.py`** - FastMCP server with tools and resources
 - **`server.py`** - Entry point for running the server
 - **`requirements.txt`** - Python dependencies (mcp, httpx)
-- **`SETUP.md`** - Detailed setup and configuration
-- **`TESTING.md`** - Testing checklist
 - **`EXAMPLES.md`** - Usage examples
 - **`.gitignore`** - Git ignore rules
 
@@ -56,7 +54,6 @@ In the Inspector UI:
 1. **Tools tab** → Call `get_current_weather` or `get_forecast` with a city name
 2. **Resources tab** → View `weather://available_cities` to see all supported cities
 
-See [TESTING.md](TESTING.md) for detailed test cases.
 
 ## Architecture
 
