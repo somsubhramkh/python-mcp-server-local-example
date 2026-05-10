@@ -1,8 +1,16 @@
 # Usage Examples - Weather MCP Server
 
-## Using with MCP Inspector
+## Setup for Testing
 
-Once you run `mcp dev weather_server.py`, you can interact with the server in the browser-based inspector.
+Before running examples, ensure:
+1. Server is running: `python server.py` (should show "Uvicorn running on http://0.0.0.0:8000")
+2. MCP Inspector is running: `npx @modelcontextprotocol/inspector http://localhost:8000`
+3. Browser shows MCP Inspector at the port shown in terminal (e.g., http://localhost:3000 or http://localhost:6274)
+   - Check the output of the npx command to find the correct port
+
+## Using MCP Inspector UI
+
+The MCP Inspector provides a browser-based interface to test your MCP server.
 
 ### Example 1: Check Current Weather
 

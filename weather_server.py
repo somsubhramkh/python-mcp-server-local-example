@@ -2,6 +2,7 @@
 """
 Weather MCP Server using Open-Meteo API
 Provides tools to get current weather and forecasts, and resources for available locations.
+Supports both stdio and HTTP/SSE transports.
 """
 
 import json
@@ -50,7 +51,7 @@ async def get_current_weather(city: str) -> str:
                 params={
                     "latitude": coords["lat"],
                     "longitude": coords["lon"],
-                    "current": "temperature_2m,weather_code,wind_speed_10m,humidity,apparent_temperature",
+                    "current": "temperature_2m,weather_code,wind_speed_10m,apparent_temperature",
                     "timezone": "auto",
                 },
                 timeout=10,
@@ -65,7 +66,6 @@ async def get_current_weather(city: str) -> str:
 Temperature: {current.get("temperature_2m")}°C (feels like {current.get("apparent_temperature")}°C)
 Condition: {weather_desc}
 Wind Speed: {current.get("wind_speed_10m")} km/h
-Humidity: {current.get("humidity")}%
 Timezone: {data.get("timezone", "Unknown")}"""
 
             return result

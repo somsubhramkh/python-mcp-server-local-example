@@ -1,72 +1,244 @@
 # Weather MCP Server
 
-A Python Model Context Protocol (MCP) server that provides weather data from the free [Open-Meteo API](https://open-meteo.com/).
+A Python Model Context Protocol (MCP) server that provides weather data from the free [Open-Meteo API](https://open-meteo.com/). Uses FastMCP with HTTP/SSE transport for easy local deployment and testing.
 
-## Quick Start
+## Features
 
-### Setup (one-time)
+- **Real-time weather data** - Current conditions and 7-day forecasts
+- **HTTP/SSE transport** - Network-accessible, no stdio required
+- **FastMCP based** - Clean, maintainable implementation
+- **MCP Inspector compatible** - Easy testing and debugging
+- **Multiple cities** - Support for 8+ major cities worldwide
+
+## Prerequisites
+
+- Python 3.10 or higher
+- Node.js (for MCP Inspector, optional)
+- pip (Python package manager)
+
+## Local Deployment Guide
+
+### Step 1: Setup Python Environment
+
 ```bash
+# Navigate to project directory
+cd /path/to/python-mcp-server-local-example
+
+# Create virtual environment
 python3 -m venv venv
-source venv/bin/activate
+
+# Activate virtual environment
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### Run the Server & Test
+### Step 2: Start the MCP Server
 
-**Terminal 1 - Start the Server:**
 ```bash
-cd /Users/somsubhra/somsubhra/mcp-server-demo
+# Make sure venv is activated
 source venv/bin/activate
-mcp run weather_server.py
+
+# Run the server
+python server.py
 ```
 
-**Terminal 2 - Start MCP Inspector:**
+**Expected output:**
+```
+Starting Weather MCP Server...
+HTTP/SSE endpoint: http://localhost:8000
+
+Connect with MCP Inspector:
+  npx @modelcontextprotocol/inspector http://localhost:8000
+
+INFO:     Started server process [12345]
+INFO:     Uvicorn running on http://0.0.0.0:8000
+```
+
+### Step 3: Connect with MCP Inspector
+
+In a **new terminal**, run:
+
 ```bash
-cd /Users/somsubhra/somsubhra/mcp-server-demo
-npx @modelcontextprotocol/inspector mcp run weather_server.py
+npx @modelcontextprotocol/inspector http://localhost:8000
 ```
 
-MCP Inspector opens in your browser. Test the tools and resources there.
+The MCP Inspector UI will open in your browser. Check the terminal output for the port number (usually `http://localhost:3000` or `http://localhost:6274`)
+
+## Testing the Server
+
+### Using MCP Inspector UI
+
+**Option 1: Test Tools**
+1. Open MCP Inspector in browser
+2. Go to **Tools** tab
+3. Select `get_current_weather`
+4. Enter city name (e.g., "New York")
+5. Click **Call tool**
+
+**Option 2: Test Forecast**
+1. Go to **Tools** tab
+2. Select `get_forecast`
+3. Enter city name (e.g., "London")
+4. View 7-day forecast
+
+**Option 3: View Available Cities**
+1. Go to **Resources** tab
+2. Click `weather://available_cities`
+3. See all supported cities and coordinates
+
+### Using curl (Command Line)
+
+```bash
+# Test server is running
+curl http://localhost:8000/
+
+# The actual MCP communication happens via SSE on /messages/ endpoint
+# This is handled by MCP clients like Inspector automatically
+```
 
 ## What It Does
 
-### Tools (callable functions)
-- **`get_current_weather`** - Get real-time weather for a city
-- **`get_forecast`** - Get 7-day weather forecast
+### Tools (Callable Functions)
+- **`get_current_weather(city)`** - Get real-time weather conditions
+  - Temperature, "feels like" temperature
+  - Weather condition description
+  - Wind speed, humidity, timezone
+  
+- **`get_forecast(city)`** - Get 7-day weather forecast
+  - Daily min/max temperatures
+  - Weather conditions
+  - Precipitation amounts
 
-### Resources (data sources)
-- **`weather://available_cities`** - List of supported cities and coordinates
+### Resources (Data Sources)
+- **`weather://available_cities`** - JSON list of supported cities with coordinates
 
 ### Supported Cities
-New York, London, Tokyo, Paris, Sydney, Dubai, Singapore, San Francisco
-
-## Project Files
-
-- **`weather_server.py`** - FastMCP server with tools and resources
-- **`server.py`** - Entry point for running the server
-- **`requirements.txt`** - Python dependencies (mcp, httpx)
-- **`EXAMPLES.md`** - Usage examples
-- **`.gitignore`** - Git ignore rules
-
-## Testing with MCP Inspector
-
-In the Inspector UI:
-1. **Tools tab** → Call `get_current_weather` or `get_forecast` with a city name
-2. **Resources tab** → View `weather://available_cities` to see all supported cities
-
+- New York
+- London
+- Tokyo
+- Paris
+- Sydney
+- Dubai
+- Singapore
+- San Francisco
 
 ## Architecture
 
 ```
-MCP Server
-├── Tools (callable by Claude)
-│   ├── get_current_weather(city)
-│   └── get_forecast(city)
-├── Resources (readable by Claude)
-│   └── weather://available_cities
-└── HTTP Client
-    └── Open-Meteo API
+HTTP Server (localhost:8000)
+│
+└── FastMCP Server
+    ├── SSE Endpoint (/messages/)
+    │   └── Bidirectional communication with MCP Inspector
+    │
+    ├── Tools
+    │   ├── get_current_weather(city)
+    │   └── get_forecast(city)
+    │
+    ├── Resources
+    │   └── weather://available_cities
+    │
+    └── HTTP Client (httpx)
+        └── Open-Meteo API (api.open-meteo.com)
 ```
+
+## Technical Details
+
+### Transport Protocol
+- **Type**: HTTP/SSE (Server-Sent Events)
+- **Port**: 8000
+- **Endpoint**: http://localhost:8000
+- **Implementation**: FastMCP's built-in SSE support with Uvicorn
+
+### Why HTTP/SSE?
+- ✅ Network-accessible (not limited to stdio)
+- ✅ Works with remote machines and cloud deployments
+- ✅ Native browser support (used by MCP Inspector)
+- ✅ Handles multiple concurrent connections
+- ✅ Cleaner code (FastMCP manages complexity)
+
+## Troubleshooting
+
+### "Address already in use" Error
+Port 8000 is already in use. Kill the existing process:
+```bash
+# macOS/Linux
+lsof -ti:8000 | xargs kill -9
+
+# Windows
+netstat -ano | findstr :8000
+taskkill /PID <PID> /F
+```
+
+### Server won't start
+1. Verify Python 3.10+ is installed: `python --version`
+2. Check all dependencies installed: `pip list | grep mcp`
+3. Check port 8000 is free
+4. Review error message in console
+
+### MCP Inspector won't connect
+1. Verify server is running (see startup message)
+2. Check http://localhost:8000 in browser (should show connection)
+3. Ensure Node.js is installed: `node --version`
+4. Try clearing MCP Inspector cache and refreshing
+
+### Tool calls are slow
+- First request may take 1-2 seconds (DNS + API call)
+- Subsequent requests usually < 1 second
+- API timeout is 10 seconds
+
+## Project Files
+
+| File | Purpose |
+|------|---------|
+| `server.py` | Entry point - starts HTTP/SSE server with Uvicorn |
+| `weather_server.py` | FastMCP server definition with tools and resources |
+| `requirements.txt` | Python dependencies (mcp, httpx, uvicorn, starlette) |
+| `EXAMPLES.md` | Detailed usage examples and integration guide |
+| `README.md` | This file |
+| `.gitignore` | Git ignore rules |
+
+## Development
+
+### Adding a New Tool
+
+Edit `weather_server.py`:
+```python
+@mcp.tool()
+async def get_new_tool(parameter: str) -> str:
+    """Tool description"""
+    # Implementation
+    return "result"
+```
+
+### Adding a New Resource
+
+```python
+@mcp.resource("weather://new_resource")
+def new_resource() -> str:
+    """Resource description"""
+    return "resource content"
+```
+
+Restart the server to see changes.
+
+## Next Steps
+
+1. ✅ Server is running on http://localhost:8000
+2. ✅ Connect with MCP Inspector: `npx @modelcontextprotocol/inspector http://localhost:8000`
+3. ✅ Test tools and resources in the UI
+4. 📖 See [EXAMPLES.md](EXAMPLES.md) for detailed usage examples
+5. 🔧 Customize and extend the server as needed
+
+## Support
+
+For issues or questions:
+- Check [EXAMPLES.md](EXAMPLES.md) for common use cases
+- Review server logs for error messages
+- Verify Open-Meteo API is accessible
+- Check Python version requirements (3.10+)
 
 
 
