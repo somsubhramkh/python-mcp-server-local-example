@@ -184,10 +184,6 @@ taskkill /PID <PID> /F
 3. Ensure Node.js is installed: `node --version`
 4. Try clearing MCP Inspector cache and refreshing
 
-### Tool calls are slow
-- First request may take 1-2 seconds (DNS + API call)
-- Subsequent requests usually < 1 second
-- API timeout is 10 seconds
 
 ## Project Files
 
@@ -224,21 +220,61 @@ def new_resource() -> str:
 
 Restart the server to see changes.
 
-## Next Steps
 
-1. ✅ Server is running on http://localhost:8000
-2. ✅ Connect with MCP Inspector: `npx @modelcontextprotocol/inspector http://localhost:8000`
-3. ✅ Test tools and resources in the UI
-4. 📖 See [EXAMPLES.md](EXAMPLES.md) for detailed usage examples
-5. 🔧 Customize and extend the server as needed
+## Docker Deployment
 
-## Support
-
-For issues or questions:
-- Check [EXAMPLES.md](EXAMPLES.md) for common use cases
-- Review server logs for error messages
-- Verify Open-Meteo API is accessible
-- Check Python version requirements (3.10+)
+Run the server as a Docker container and test it with MCP Inspector on your host machine.
 
 
+### Step 1: Build the Docker Image
+
+```bash
+# From the project root directory
+docker build -t weather-mcp-server .
+```
+
+### Step 2: Run the Container
+
+```bash
+docker run -d \
+  --name weather-mcp \
+  -p 8000:8000 \
+  weather-mcp-server
+```
+
+**Verify the container is running:**
+```bash
+docker ps
+docker logs weather-mcp
+```
+
+### Step 3: Test with MCP Inspector (on Host)
+
+In a terminal on your host machine, run:
+
+```bash
+npx @modelcontextprotocol/inspector http://localhost:8000
+```
+
+The MCP Inspector connects to the container via the mapped port. Open the URL shown in the terminal output (typically `http://localhost:6274`) and use the **Tools** and **Resources** tabs to interact with the server.
+
+### Troubleshooting Docker
+
+**Container exits immediately:**
+```bash
+docker logs weather-mcp
+```
+Check the logs for Python errors or missing dependencies.
+
+**MCP Inspector can't connect:**
+- Confirm the container is running: `docker ps`
+- Confirm port mapping is active: `docker port weather-mcp`
+- Test the endpoint directly: `curl http://localhost:8000/`
+
+**Port 8000 already in use on the host:**
+Map to a different host port — update both the `docker run` flag and the Inspector URL:
+```bash
+docker run -d --name weather-mcp -p 8080:8000 weather-mcp-server
+npx @modelcontextprotocol/inspector http://localhost:8080
+```
 
