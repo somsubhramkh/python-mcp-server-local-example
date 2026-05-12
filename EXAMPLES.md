@@ -178,7 +178,6 @@ Try these tool calls to understand behavior:
 - [ ] Can read weather://available_cities resource
 - [ ] Response times are < 2-3 seconds
 - [ ] No errors in server logs
-- [ ] Claude Desktop recognizes the server (if set up)
 - [ ] Can have natural conversations about weather
 
 ## Performance Notes
